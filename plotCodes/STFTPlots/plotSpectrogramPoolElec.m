@@ -1,4 +1,17 @@
-function plotSpectrogramPoolElec(dataLog,gammaBand,refChan,numElec,movingWin,BLPeriod,STPeriod,tapers,Fs)
+function BestEEGChans = plotSpectrogramPoolElec(dataLog,gammaBand,refChan,numElec,movingWin,BLPeriod,STPeriod,tapers,Fs)
+
+if ~exist('dataLog','var')
+    try
+        dataLog = evalin('base','dataLog');
+    catch
+        fileExt = {'*.mat'};
+        [hdrfile,path] = uigetfile(fileExt, 'Select dataLog file...');
+        if hdrfile(1) == 0, return; end
+        fname = fullfile(path,hdrfile);
+        dataL = load(fname);
+        dataLog = dataL.dataLog;
+    end
+end
 
 if ~exist('gammaBand','var')||isempty(gammaBand); gammaBand = 'Low Gamma'; end;
 if ~exist('refChan','var')||isempty(refChan); refChan = 'Bipolar'; end;
@@ -98,6 +111,7 @@ plotNum = 1;
 figG = figure(10121); set(figG,'numbertitle', 'off','name','Pooled Spectrogram');
 figV = figure(10122); set(figV,'numbertitle', 'off','name','Mean Change in Power');
 
+BestEEGChans = [];
 
 for a=1:aLen
     for e=1:eLen
@@ -238,6 +252,10 @@ for a=1:aLen
                                                     set(gca,'XTick',1:plotNum);
 %                                                     title([xTitle ': ' num2str(xAxis(iX)) '; ' yTitle ': ' num2str(yAxis(iY))]);
 %                                                     xlabel(['Elecs: ' num2str(EEGChannelsBip')]);
+                                                    
+                                                    if a>1 || e>1 || s>4 || f>1 || o>1 || c>4 || t<7 || aa>1 || ae>1 || as>1 || ao>1 || av>1 || at>1 || plotNum == 1
+                                                        BestEEGChans = union(BestEEGChans,EEGChannelsBip);
+                                                    end
     
                                                     drawnow
                                                     plotNum = plotNum + 1;
@@ -255,28 +273,4 @@ for a=1:aLen
     end
 end
 
-end
-
-function [nmaxIndex,nmaxIndexOriginal] = findIndexNMax(Data,N,cutOffRange,gridMontage,refChan)
-    [sortedData(:,1),sortedData(:,2)] = sort(Data,'descend');
-    sortedData((sortedData(:,2)<cutOffRange(1) | sortedData(:,2)>=cutOffRange(2)),:) = [];
-    nmaxIndex = sortedData(1:N,2);
-%     nmaxIndexNum = nmaxIndex;
-    
-    if strcmp(refChan,'Bipolar')
-        [~,~,bipolarLocs] = loadChanLocs(gridMontage,4);        
-        nmaxIndexOriginal = bipolarLocs(nmaxIndex,:);
-    end
-end
-
-function [Data,goodPos] = getRefData(plotData,trialNums,allBadTrials)
-    numChan2 = size(plotData,1);
-    datCount = 1;
-    for iNC = 1:2:(numChan2-1)
-        Data(datCount,:,:) = plotData(iNC,:,:)-plotData(iNC+1,:,:);
-        badPos = union(allBadTrials{iNC},allBadTrials{iNC+1});
-        goodTrials = setdiff(trialNums,badPos);
-        goodPos{datCount} = find(ismember(trialNums,goodTrials));
-        datCount = datCount + 1;
-    end
 end

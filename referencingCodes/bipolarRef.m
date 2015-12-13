@@ -93,7 +93,9 @@ function [Data,goodPos] = bipolarRef(plotData,refChanIndex,gridMontage,trialNums
             for iR = 1:size(plotData,1)
                 waitbar((iR/size(plotData,1)),hRD,['Rereferencing data for electrode ' num2str(iR) ' of ' num2str(size(plotData,1)) ' electrodes...']);
                 Data(iR,:,:) = plotData(iR,:,:) - plotData(refChanIndex,:,:);
-                badPos{iR} = intersect(allBadTrials{iR},allBadTrials{refChanIndex});
+                badPos{iR} = union(allBadTrials{iR},allBadTrials{refChanIndex});
+                goodTrials = setdiff(trialNums,badPos{iR});
+                goodPos{iR} = find(ismember(trialNums,goodTrials));
             end
 %             Data((iR+1),:,:) = (-1)*plotData(refChanIndex,:,:);
             close(hRD);

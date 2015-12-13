@@ -44,8 +44,8 @@ for iV = 1:totIndex
     disp('Bipolar Referencing...');
     compareBandPowerPerProtocol(dataLog,AlphaBand,LGBand,HGBand,desiredBandWidth,EEGChannels,'Bipolar',movingWin,Fs,tapers,BLPeriod,STPeriod);
 
-    disp('Hemisphere Referencing...');
-    compareBandPowerPerProtocol(dataLog,AlphaBand,LGBand,HGBand,desiredBandWidth,EEGChannels,'Hemisphere',movingWin,Fs,tapers,BLPeriod,STPeriod);
+%     disp('Hemisphere Referencing...');
+%     compareBandPowerPerProtocol(dataLog,AlphaBand,LGBand,HGBand,desiredBandWidth,EEGChannels,'Hemisphere',movingWin,Fs,tapers,BLPeriod,STPeriod);
     
 end
 
