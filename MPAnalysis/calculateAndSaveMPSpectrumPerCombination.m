@@ -54,7 +54,7 @@ conversionFactor = 1000;
     for electrodeNum = 1:totElecs
         
         waitbar((electrodeNum-1)/totElecs,hWE,['Analysing for electrode ' num2str(electrodeNum) ' of ' num2str(totElecs) ' electrode...']);
-        clearvars -except folderMP folderTemp tag totElecs hWE Data electrodeNum goodPos timeVals Fs baselineS Max_iterations wrap timeRange freqRange conversionFactor
+        clearvars -except folderMP folderTemp tag totElecs hWE Data electrodeNum goodPos timeVals Fs baselineS Max_iterations wrap timeRange freqRange conversionFactor numberOfTrials
         
         data = squeeze(Data(electrodeNum,goodPos{electrodeNum},:));
         [numTrials,L]=size(data);             % length of signal
@@ -75,12 +75,12 @@ conversionFactor = 1000;
         freqAxis = 0:Fs/L:Fs/2;              % frequency axis
         recEnAll=zeros(length(freqAxis),L);  % initialising energy matrix
 
-        atomListIndex = intersect(find(freqAxis>freqRange(1)),find(freqAxis<freqRange(2)));
+%         atomListIndex = intersect(find(freqAxis>freqRange(1)),find(freqAxis<freqRange(2)));
         disp('Reconstructing energy...');
         hWT = waitbar(0,['Reconstructing energy for trial 1 of ' num2str(numTrials) ' trials...']);
         for i=1:numTrials
             waitbar((i-1)/numTrials,hWT,['Reconstructing energy for trial ' num2str(i) ' of ' num2str(numTrials) ' trials...']);
-            atomList = find(ismember(gaborInfo{1, i}.gaborData(2,:),atomListIndex));
+%             atomList = find(ismember(gaborInfo{1, i}.gaborData(2,:),atomListIndex));
             atomList = []; % all atoms
             recEn=reconstructEnergyFromAtomsMPP(gaborInfo{i}.gaborData,L,wrap,atomList);
             recEnAll =recEnAll + recEn;
@@ -91,6 +91,7 @@ conversionFactor = 1000;
         timeL = (timeVals>=timeRange(1)) & (timeVals<timeRange(2));
         freqL = (freqAxis>=freqRange(1)) & (freqAxis<freqRange(2));                
         rawEnergy = int16(logMeanEn(freqL,timeL)*conversionFactor);
+        numberOfTrials(electrodeNum) = numTrials;
         save(fullfile(folderMP,['elec' num2str(electrodeNum) '.mat']),'rawEnergy');        
     end
     close(hWE);
@@ -112,6 +113,6 @@ MPExtractionInfo{6,1} = 'conversionFactor';
 MPExtractionInfo{6,2} = conversionFactor;
 
 save(fullfile(folderMP,'MPExtractionInfo.mat'),'MPExtractionInfo');
-
+save(fullfile(folderMP,'numberOfTrials.mat'),'numberOfTrials');
     
 end
