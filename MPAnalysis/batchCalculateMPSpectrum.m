@@ -1,4 +1,4 @@
-function batchCalculateMPSpectrum(extractTheseIndices,refChan,Max_iterations,freqRange,timeRange,wrap)
+function batchCalculateMPSpectrum(extractTheseIndices,parallelFlag,refChan,Max_iterations,freqRange,timeRange,wrap)
 
 % Define defaults
 if ~exist('refChan','var') || isempty(refChan); refChan = 'Bipolar'; end
@@ -6,6 +6,7 @@ if ~exist('Max_iterations','var') || isempty(Max_iterations); Max_iterations = 1
 if ~exist('freqRange','var') || isempty(freqRange); freqRange = [0 250]; end
 if ~exist('timeRange','var') || isempty(timeRange); timeRange = [-0.5 1.5]; end
 if ~exist('wrap','var') || isempty(wrap); wrap = 1; end
+if ~exist('parallelFlag','var') || isempty(parallelFlag); parallelFlag = 0; end
     
 [~,subjectNames,expDates,protocolNames,~,gridType,folderSourceString] = allDataLogsForAnalysisHumanEEG;
 
@@ -39,5 +40,5 @@ for iV = 1:totIndex
     disp([subjectName expDate protocolName]);
     
     disp([refChan ' Referencing...']);
-    calculateMPSpectrumPerProtocol(dataLog,refChan,Max_iterations,freqRange,timeRange,wrap)
+    calculateMPSpectrumPerProtocol(dataLog,parallelFlag,refChan,Max_iterations,freqRange,timeRange,wrap)
 end

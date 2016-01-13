@@ -1,4 +1,4 @@
-function calculateMPSpectrumPerProtocol(dataLog,refChan,Max_iterations,freqRange,timeRange,wrap)
+function calculateMPSpectrumPerProtocol(dataLog,parallelFlag,refChan,Max_iterations,freqRange,timeRange,wrap)
 
     % Define defaults
     if ~exist('refChan','var') || isempty(refChan); refChan = 'Bipolar'; end
@@ -6,6 +6,7 @@ function calculateMPSpectrumPerProtocol(dataLog,refChan,Max_iterations,freqRange
     if ~exist('freqRange','var') || isempty(freqRange); freqRange = [0 250]; end
     if ~exist('timeRange','var') || isempty(timeRange); timeRange = [-0.5 1.5]; end
     if ~exist('wrap','var') || isempty(wrap); wrap = 1; end
+    if ~exist('parallelFlag','var') || isempty(parallelFlag); parallelFlag = 1; end
     
     [~,folderName]=getFolderDetails(dataLog);
     folderExtract = fullfile(folderName,'extractedData');    
@@ -64,8 +65,13 @@ function calculateMPSpectrumPerProtocol(dataLog,refChan,Max_iterations,freqRange
                                                         disp(['av = ' num2str(av) ' | ' num2str(avValsUnique(av))]);
                                                         disp(['at = ' num2str(at) ' | ' num2str(atValsUnique(at))]);                                                        
                                                         
-                                                        folderMP = calculateAndSaveMPSpectrumPerCombination(a,e,s,f,o,c,t,aa,ae,as,ao,av,at,dataLog,...
-                                                            refChan,Max_iterations,wrap,freqRange,timeRange);
+                                                        if parallelFlag
+                                                            folderMP = parCalculateAndSaveMPSpectrumPerCombination(a,e,s,f,o,c,t,aa,ae,as,ao,av,at,dataLog,...
+                                                                refChan,Max_iterations,wrap,freqRange,timeRange);
+                                                        else
+                                                            folderMP = calculateAndSaveMPSpectrumPerCombination(a,e,s,f,o,c,t,aa,ae,as,ao,av,at,dataLog,...
+                                                                refChan,Max_iterations,wrap,freqRange,timeRange);
+                                                        end
                                                         
                                                         MPSpectrumAllElec(iLoop).a = a;
                                                         MPSpectrumAllElec(iLoop).e = e;
