@@ -72,8 +72,13 @@ combMat = [analysedDataAllElec.a; analysedDataAllElec.e; analysedDataAllElec.s; 
 combMat = combMat';
 
 totLen = aLen*eLen*sLen*fLen*oLen*cLen*tLen*aaLen*aeLen*asLen*aoLen*avLen*atLen;
-xNum = max(factor(totLen));
-yNum = totLen/xNum;
+if isprime(totLen);
+    xNum = max(factor(totLen+1));
+else
+    xNum = max(factor(totLen));
+end
+% xNum = max(factor(totLen));
+yNum = ceil(totLen/xNum);
 if yNum < 4; tNum = yNum; yNum = xNum; xNum = tNum; end
 plotNum = 1;
 
@@ -160,16 +165,19 @@ for a=1:aLen
                                                     % High gamma
                                                     peakPowerHG = analysedDataAllElec(index).meanPowerAllElecHG{1, 1};
                                                     figure(figHG); subplot(xNum,yNum,plotNum); topoplot(peakPowerHG,chanlocs,'electrodes','numbers','style','both','drawaxis','off','nosedir',noseDir);
+%                                                     headplot(peakPowerHG,'bipMon.mat','labels',0,'view','back');
                                                     caxis([-2 2]); title([xTitle ': ' num2str(xAxis(iX)) '; ' yTitle ': ' num2str(yAxis(iY))]);
 
                                                     % Low gamma
                                                     peakPowerLG = analysedDataAllElec(index).meanPowerAllElecLG{1, 1};
                                                     figure(figLG); subplot(xNum,yNum,plotNum); topoplot(peakPowerLG,chanlocs,'electrodes','numbers','style','both','drawaxis','off','nosedir',noseDir);
+%                                                     headplot(peakPowerLG,'bipMon.mat','labels',0,'view','back');
                                                     caxis([-2 2]); title([xTitle ': ' num2str(xAxis(iX)) '; ' yTitle ': ' num2str(yAxis(iY))]);
 
                                                     % Alpha
                                                     peakPowerAlpha = analysedDataAllElec(index).meanPowerAllElecAlpha{1, 1};
                                                     figure(figAlpha); subplot(xNum,yNum,plotNum); topoplot(peakPowerAlpha,chanlocs,'electrodes','numbers','style','both','drawaxis','off','nosedir',noseDir);
+%                                                     headplot(peakPowerAlpha,'bipMon.mat','labels',0,'view','back');
                                                     caxis([-2 2]); title([xTitle ': ' num2str(xAxis(iX)) '; ' yTitle ': ' num2str(yAxis(iY))]);
 
                                                     drawnow

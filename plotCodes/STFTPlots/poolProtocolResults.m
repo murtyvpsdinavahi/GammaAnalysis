@@ -34,7 +34,7 @@ uicontrol('Unit','Normalized', ...
         'Position',[0.4 0.96 0.2 0.03], ...
         'Style','text','String',protocolTypeName,'FontSize',15);
 
-colorVectors = 0.5*rand(length(dataLogIndices),3)+0.1;
+% colorVectors = 0.5*rand(length(dataLogIndices),3)+0.1;
 
 for iBand = 1:plotCols
     freqBand = freqBands{iBand};
@@ -124,7 +124,9 @@ for iBand = 1:plotCols
     combMat = [analysedDataAllElec.a; analysedDataAllElec.e; analysedDataAllElec.s; analysedDataAllElec.f; analysedDataAllElec.o; analysedDataAllElec.c; analysedDataAllElec.t;...
         analysedDataAllElec.aa; analysedDataAllElec.ae; analysedDataAllElec.as; analysedDataAllElec.ao; analysedDataAllElec.av; analysedDataAllElec.at];
     combMat = combMat';
+    clear peakPowerPooledSub
         for x=1:xLen    
+            clear peakPower
             for p = 1:poolLen        
                 switch protocolType
                     case 'AZI';        a = x;
@@ -163,7 +165,7 @@ for iBand = 1:plotCols
                 index = multiIntersect(find(combMat(:,1) == a), find(combMat(:,2) == e), find(combMat(:,3) == s),...
                     find(combMat(:,4) == f), find(combMat(:,5) == o), find(combMat(:,6) == c), find(combMat(:,7) == t),...
                     find(combMat(:,8) == aa), find(combMat(:,9) == ae), find(combMat(:,10) == as),...
-                    find(combMat(:,11) == ao), find(combMat(:,12) == av), find(combMat(:,13) == at));        
+                    find(combMat(:,11) == ao), find(combMat(:,12) == av), find(combMat(:,13) == at));     
 
                 switch freqBand
                     case 'High Gamma'
@@ -179,8 +181,14 @@ for iBand = 1:plotCols
                         fMin = 7;
                         fMax = 15;
                 end
+                
+%                 if strcmp(gridMontage,'brainCap64') && strcmp(refChan,'Bipolar') % brainCap64 has one electrode less than actiCap64 in bipolar maontage system
+%                     peakPowerMont(1,end+1) = peakPowerMont(1,end);
+%                 end
+%                 
+%                 peakPower(index,:) = peakPowerMont;                    
 
-                [EEGChansBip,EEGChannels] = findIndexNMax(peakPower(index,:),numElec,[50 96],gridMontage,refChan);
+                [~,EEGChannels] = findIndexNMax(peakPower(index,:),numElec,[50 96],gridMontage,refChan);
                 EEGChannelsToExtract = rowCat(EEGChannels);
                 [plotData,trialNums,allBadTrials] = getDataGAV(a,e,s,f,o,c,t,aa,ae,as,ao,av,at,folderName,folderLFP,EEGChannelsToExtract); 
                 [dataProt,goodPosProt] = getRefData(plotData,trialNums,allBadTrials(EEGChannelsToExtract));
@@ -200,7 +208,7 @@ for iBand = 1:plotCols
                 end
 
             end
-            peakPowerPooled(iBand,dataLogIndex,x,:) = peakPowerPooledSub(x,:)/p;
+            peakPowerPooled{iBand,dataLogIndex,x} = peakPowerPooledSub(x,:)/p;
             dataBestElec = squeeze(Data(1,:,:));
             dataTFAllElec = [];
             for iCD=1:size(Data,1)                                                        
@@ -253,7 +261,8 @@ for iBand = 1:plotCols
         meanCurveData = mean(curveData,1);
         stdCurveData = std(curveData,1,1);
         semCurveData = stdCurveData/sqrt(length(dataLogIndices));
-        curveColor = colorVectors(dataLogIndex,:);
+%         curveColor = colorVectors(dataLogIndex,:);
+        curveColor = getColorRGB(dataLogIndex);
         curveSpecifier = lineSpecifiers{dataLogIndex};
         
         if strcmp(protocolType,'SF') || strcmp(protocolType,'SIZE')
@@ -301,10 +310,10 @@ for iBand = 1:plotCols
         % Plot topoplot for best condition
         if strcmp(freqBand,'Alpha')
             [~,bestCond] = min(meanPowerAllElec(iBand,dataLogIndexForTopo,:));
-            peakPowerToPlot = -1*(squeeze(peakPowerPooled(iBand,dataLogIndexForTopo,bestCond,:)));
+            peakPowerToPlot = -1*(squeeze(peakPowerPooled{iBand,dataLogIndexForTopo,bestCond}));
         else
             [~,bestCond] = max(meanPowerAllElec(iBand,dataLogIndexForTopo,:));
-            peakPowerToPlot = squeeze(peakPowerPooled(iBand,dataLogIndexForTopo,bestCond,:));
+            peakPowerToPlot = squeeze(peakPowerPooled{iBand,dataLogIndexForTopo,bestCond});
         end
                 
         subplot(hGridPlot(1,iBand)); topoplot(peakPowerToPlot,chanlocs,'electrodes','numbers','style','both','drawaxis','off','nosedir',noseDir);

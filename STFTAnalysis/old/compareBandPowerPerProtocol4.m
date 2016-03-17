@@ -1,12 +1,12 @@
-function calculateMPSpectrumPerProtocol(dataLog,parallelFlag,refChan,Max_iterations,freqRange,timeRange,wrap)
+function gammaDataAllElec = compareBandPowerPerProtocol4(dataLog,GammaBand,EEGChannels,refChan,Fs,tapers,BLPeriod,STPeriod)
 
-    % Define defaults
-    if ~exist('refChan','var') || isempty(refChan); refChan = 'Bipolar'; end
-    if ~exist('Max_iterations','var') || isempty(Max_iterations); Max_iterations = 100; end    
-    if ~exist('freqRange','var') || isempty(freqRange); freqRange = [0 250]; end
-    if ~exist('timeRange','var') || isempty(timeRange); timeRange = [-0.5 1.5]; end
-    if ~exist('wrap','var') || isempty(wrap); wrap = 1; end
-    if ~exist('parallelFlag','var') || isempty(parallelFlag); parallelFlag = 1; end
+    if ~exist('GammaBand','var')||isempty(GammaBand); GammaBand = [21 80]; end;
+    if ~exist('EEGChannels','var')||isempty(EEGChannels); EEGChannels = dataLog{7, 2}; end;
+    if ~exist('refChan','var')||isempty(refChan); refChan = 'Bipolar'; end;
+    if ~exist('Fs','var')||isempty(Fs); Fs = dataLog{9, 2}; end;
+    if ~exist('tapers','var')||isempty(tapers); tapers = [2 3]; end;
+    if ~exist('BLPeriod','var')||isempty(BLPeriod); BLPeriod = [-0.5 0]; end;
+    if ~exist('STPeriod','var')||isempty(STPeriod); STPeriod = [0.25 0.75]; end;
     
     [~,folderName]=getFolderDetails(dataLog);
     folderExtract = fullfile(folderName,'extractedData');    
@@ -31,9 +31,9 @@ function calculateMPSpectrumPerProtocol(dataLog,parallelFlag,refChan,Max_iterati
     iLoop = 1;
     
     tic;
-    diary(fullfile(folderName,['MPSpectrumAllElec_' refChan '.txt']));
+    diary(fullfile(folderName,['gammaDataAllElec_' refChan '.txt']));
     disp(['Total Combinations: ' num2str(totLen)]);
-    hW = waitbar(0,['Calculating MP Spectrum for combination 1 of ' num2str(totLen)],'position',[465.0000  409.7500  270.0000   56.2500]);
+    hW = waitbar(0,['Calculating band power for combination 1 of ' num2str(totLen)],'position',[465.0000  409.7500  270.0000   56.2500]);
     for a=1:aLen
         for e=1:eLen
             for s=1:sLen
@@ -48,7 +48,7 @@ function calculateMPSpectrumPerProtocol(dataLog,parallelFlag,refChan,Max_iterati
                                                 for av=1:avLen
                                                     for at=1:atLen
                                                         
-                                                        waitbar((iLoop-1)/totLen,hW,['Calculating MP Spectrum for combination ' num2str(iLoop) ' of ' num2str(totLen)]);
+                                                        waitbar((iLoop-1)/totLen,hW,['Calculating band power for combination ' num2str(iLoop) ' of ' num2str(totLen)]);
                                                         
                                                         disp([char(10) 'Combination: ']);
                                                         disp(['a = ' num2str(a) ' | ' num2str(aValsUnique(a))]);
@@ -65,29 +65,25 @@ function calculateMPSpectrumPerProtocol(dataLog,parallelFlag,refChan,Max_iterati
                                                         disp(['av = ' num2str(av) ' | ' num2str(avValsUnique(av))]);
                                                         disp(['at = ' num2str(at) ' | ' num2str(atValsUnique(at))]);                                                        
                                                         
-                                                        if parallelFlag
-                                                            folderMP = parCalculateAndSaveMPSpectrumPerCombination(a,e,s,f,o,c,t,aa,ae,as,ao,av,at,dataLog,...
-                                                                refChan,Max_iterations,wrap,freqRange,timeRange);
-                                                        else
-                                                            folderMP = calculateAndSaveMPSpectrumPerCombination(a,e,s,f,o,c,t,aa,ae,as,ao,av,at,dataLog,...
-                                                                refChan,Max_iterations,wrap,freqRange,timeRange);
-                                                        end
+                                                        [powerGammaAllElec,peakFreqGammaAllElec] = calculateBandPowerPerProtocol4(a,e,s,f,o,c,t,aa,ae,as,ao,av,at,dataLog,GammaBand,EEGChannels,refChan,Fs,tapers,BLPeriod,STPeriod);
+                                                                        
                                                         
-                                                        MPSpectrumAllElec(iLoop).a = a;
-                                                        MPSpectrumAllElec(iLoop).e = e;
-                                                        MPSpectrumAllElec(iLoop).s = s;
-                                                        MPSpectrumAllElec(iLoop).f = f;
-                                                        MPSpectrumAllElec(iLoop).o = o;
-                                                        MPSpectrumAllElec(iLoop).c = c;
-                                                        MPSpectrumAllElec(iLoop).t = t;
-                                                        MPSpectrumAllElec(iLoop).aa = aa;
-                                                        MPSpectrumAllElec(iLoop).ae = ae;
-                                                        MPSpectrumAllElec(iLoop).as = as;
-                                                        MPSpectrumAllElec(iLoop).ao = ao;
-                                                        MPSpectrumAllElec(iLoop).av = av;
-                                                        MPSpectrumAllElec(iLoop).at = at;
+                                                        gammaDataAllElec(iLoop).a = a;
+                                                        gammaDataAllElec(iLoop).e = e;
+                                                        gammaDataAllElec(iLoop).s = s;
+                                                        gammaDataAllElec(iLoop).f = f;
+                                                        gammaDataAllElec(iLoop).o = o;
+                                                        gammaDataAllElec(iLoop).c = c;
+                                                        gammaDataAllElec(iLoop).t = t;
+                                                        gammaDataAllElec(iLoop).aa = aa;
+                                                        gammaDataAllElec(iLoop).ae = ae;
+                                                        gammaDataAllElec(iLoop).as = as;
+                                                        gammaDataAllElec(iLoop).ao = ao;
+                                                        gammaDataAllElec(iLoop).av = av;
+                                                        gammaDataAllElec(iLoop).at = at;
                                                         
-                                                        MPSpectrumAllElec(iLoop).folderMP = folderMP;                                                        
+                                                        gammaDataAllElec(iLoop).powerGammaAllElec = {powerGammaAllElec};
+                                                        gammaDataAllElec(iLoop).peakFreqGammaAllElec = {peakFreqGammaAllElec};
                                                                                                                 
                                                         disp(['Done...']);
                                                         iLoop = iLoop + 1;
@@ -107,8 +103,8 @@ function calculateMPSpectrumPerProtocol(dataLog,parallelFlag,refChan,Max_iterati
     end
     
     close(hW);
-    save(fullfile(folderName,['MPSpectrumAllElec_' refChan '.mat']),'MPSpectrumAllElec');    
-    disp(['Data saved to ' fullfile(folderName,['MPSpectrumAllElec_' refChan '.mat'])]); 
+    save(fullfile(folderName,['gammaDataAllElec_' refChan '.mat']),'gammaDataAllElec');    
+    disp(['Data saved to ' fullfile(folderName,['gammaDataAllElec_' refChan '.mat'])]); 
     elapsedTime = toc/60;
     disp(['Total time taken for Analysis: ' num2str(elapsedTime) ' min.']);
     diary('off');

@@ -4,7 +4,9 @@
 clear; clc;
 
 % Variables
-subjectName = {'GR';'VV';'RS';'AD'};
+
+% subjectName = {'SB';'VV';'GR';'RS';'AD';'PM';'AB';'AV'};
+% subjectName = {'SB';'VV'};
 subjectToPlotTopo = 'VV';
 freqBands = {'Alpha';'Low Gamma';'High Gamma'};
 refChan = 'Bipolar';
@@ -12,6 +14,7 @@ desiredBandWidth = 20;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 movingWin = [0.4 0.01];
 tapers = [2 3];
 BLPeriod = [-0.5 0];
@@ -19,8 +22,10 @@ STPeriod = [0.25 0.75];
 numElec = 5;
 gridMontage = 'actiCap64';
 lineSpecifiers = {'+';'*';'.';'x';'s';'d';'^';'v';'>';'<';'p';'h'};
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 mtmParams.tapers = tapers;
 mtmParams.trialave=0;
 mtmParams.err=0;
@@ -32,12 +37,29 @@ BLMax = BLPeriod(2);
 STMin = STPeriod(1);
 STMax = STPeriod(2);   
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 [dataLogList.folderEEG,dataLogList.subjectNames,dataLogList.expDates,dataLogList.protocolNames,dataLogList.protocolTypes,...
     dataLogList.gridType,dataLogList.folderSourceString,dataLogList.capMontage] = allDataLogsForAnalysisHumanEEG;
+
 subjectNames = dataLogList.subjectNames;
+subjectName = unique(subjectNames);
 subjectNum = length(subjectName);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+for subIn = 1:subjectNum
+    runPlotProtocolResults(subjectName{subIn});
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 subjectIndices = [];
 for sub = 1:subjectNum
+    
     subjectIndex = find(strcmp(subjectName(sub),subjectNames));
     subjectIndices = union(subjectIndex,subjectIndices);
 end

@@ -1,4 +1,4 @@
-function BestEEGChans = plotSpectrogramPoolElec(dataLog,gammaBand,refChan,numElec,movingWin,BLPeriod,STPeriod,tapers,Fs)
+function BestEEGChans = plotSpectrogramPoolElec_02(dataLog,gammaBand,refChan,EEGChannelsToPlot,movingWin,BLPeriod,STPeriod,tapers,Fs)
 
 if ~exist('dataLog','var')
     try
@@ -15,7 +15,7 @@ end
 
 if ~exist('gammaBand','var')||isempty(gammaBand); gammaBand = 'Low Gamma'; end;
 if ~exist('refChan','var')||isempty(refChan); refChan = 'Bipolar'; end;
-if ~exist('numElec','var')||isempty(numElec); numElec = 5; end;
+% if ~exist('EEGChannelsToPlot','var')||isempty(EEGChannelsToPlot); EEGChannelsToPlot = []; end;
 
 if ~exist('movingWin','var')||isempty(movingWin); movingWin = [0.4 0.01]; end;
 if ~exist('Fs','var')||isempty(Fs); Fs = dataLog{9, 2}; end;
@@ -44,8 +44,8 @@ folderSegment = fullfile(folderName,'segmentedData');
 folderLFP = fullfile(folderSegment,'LFP');
 [~,timeVals] = loadlfpInfo(folderLFP);
 
-load(fullfile(folderName,['analysedDataAllElec_' refChan '.mat']));
-% load(fullfile(folderName,['gammaBandDataAllElec_' refChan '.mat']));
+% load(fullfile(folderName,['analysedDataAllElec_' refChan '.mat']));
+load(fullfile(folderName,['gammaBandDataAllElec_' refChan '.mat']));
 
 folderExtract = fullfile(folderName,'extractedData');
 [~,aValsUnique,eValsUnique,sValsUnique,fValsUnique,oValsUnique,cValsUnique,tValsUnique,aaValsUnique,...
@@ -99,10 +99,10 @@ if aoLen > 1; yAxis = aoValsUnique; yTitle = 'RP'; end
 if avLen > 1; yAxis = avValsUnique; yTitle = 'Rip Vol'; end
 if atLen > 1; yAxis = atValsUnique; yTitle = 'Rip Vel'; end
     
-combMat = [analysedDataAllElec.a; analysedDataAllElec.e; analysedDataAllElec.s; analysedDataAllElec.f; analysedDataAllElec.o; analysedDataAllElec.c; analysedDataAllElec.t;...
-    analysedDataAllElec.aa; analysedDataAllElec.ae; analysedDataAllElec.as; analysedDataAllElec.ao; analysedDataAllElec.av; analysedDataAllElec.at];
-% combMat = [gammaBandDataAllElec.a; gammaBandDataAllElec.e; gammaBandDataAllElec.s; gammaBandDataAllElec.f; gammaBandDataAllElec.o; gammaBandDataAllElec.c; gammaBandDataAllElec.t;...
-%     gammaBandDataAllElec.aa; gammaBandDataAllElec.ae; gammaBandDataAllElec.as; gammaBandDataAllElec.ao; gammaBandDataAllElec.av; gammaBandDataAllElec.at];
+% combMat = [analysedDataAllElec.a; analysedDataAllElec.e; analysedDataAllElec.s; analysedDataAllElec.f; analysedDataAllElec.o; analysedDataAllElec.c; analysedDataAllElec.t;...
+%     analysedDataAllElec.aa; analysedDataAllElec.ae; analysedDataAllElec.as; analysedDataAllElec.ao; analysedDataAllElec.av; analysedDataAllElec.at];
+combMat = [gammaBandDataAllElec.a; gammaBandDataAllElec.e; gammaBandDataAllElec.s; gammaBandDataAllElec.f; gammaBandDataAllElec.o; gammaBandDataAllElec.c; gammaBandDataAllElec.t;...
+    gammaBandDataAllElec.aa; gammaBandDataAllElec.ae; gammaBandDataAllElec.as; gammaBandDataAllElec.ao; gammaBandDataAllElec.av; gammaBandDataAllElec.at];
 combMat = combMat';
 
 totLen = aLen*eLen*sLen*fLen*oLen*cLen*tLen*aaLen*aeLen*asLen*aoLen*avLen*atLen;
@@ -117,7 +117,7 @@ if yNum < 4; tNum = yNum; yNum = xNum; xNum = tNum; end
 plotNum = 1;
 
 figG = figure(10121); set(figG,'numbertitle', 'off','name','Pooled Spectrogram');
-figV = figure(10122); set(figV,'numbertitle', 'off','name','Mean Change in Power');
+% figV = figure(10122); set(figV,'numbertitle', 'off','name','Mean Change in Power');
 
 BestEEGChans = [];
 
@@ -199,18 +199,18 @@ for a=1:aLen
 
                                                     switch gammaBand
                                                         case 'High Gamma'
-                                                            peakPower = analysedDataAllElec(index).meanPowerAllElecHG{1, 1};
-%                                                             peakPower = gammaBandDataAllElec(index).changePowerHGamma{1, 1};
+%                                                             peakPower = analysedDataAllElec(index).meanPowerAllElecHG{1, 1};
+                                                            peakPower = gammaBandDataAllElec(index).changePowerHGamma{1, 1};
                                                             fMin = 51;
                                                             fMax = 80;
                                                         case 'Low Gamma'
-                                                            peakPower = analysedDataAllElec(index).meanPowerAllElecLG{1, 1};
-%                                                             peakPower = gammaBandDataAllElec(index).changePowerLGamma{1, 1};
+%                                                             peakPower = analysedDataAllElec(index).meanPowerAllElecLG{1, 1};
+                                                            peakPower = gammaBandDataAllElec(index).changePowerLGamma{1, 1};
                                                             fMin = 21;
                                                             fMax = 50;
                                                     end
                                                     
-                                                    [EEGChannelsBip,EEGChannels] = findIndexNMax(peakPower,numElec,[50 96],gridMontage,refChan); % Only central, temporal, parietal and occipital electrodes.
+                                                    [EEGChannelsBip,EEGChannels] = findIndexNMax(peakPower,[],EEGChannelsToPlot,gridMontage,refChan); % Only central, temporal, parietal and occipital electrodes.
                                                                                                             % Excluding Frontal and fronto-central electrodes                                                            
                                                     
                                                     EEGChannelsToExtract = rowCat(EEGChannels);
@@ -239,29 +239,29 @@ for a=1:aLen
                                                     
                                                     specPower = squeeze(mean(dSPower,1));
                                                     
-                                                    % get time and frequency axes
-                                                    tStim =  (tAxis>=STMin) & (tAxis<=STMax);
-
-                                                    fRange =   (fAxis>=fMin) & (fAxis<=fMax);
-                                                    fRangeVal = fAxis(fRange);                                                    
-
-                                                    % get power values in LG and HG bands
-                                                    dPower = specPower(tStim,fRange);
-                                                    meanPeakFreqForCondition = findPeakBandWidth(dPower,fRangeVal);
-                                                    fBandMin = meanPeakFreqForCondition - (desiredBandWidth/2-1);
-                                                    fBandMax = meanPeakFreqForCondition + (desiredBandWidth/2);
-                                                    fBandRange =   (fAxis>=fBandMin) & (fAxis<=fBandMax);
-                                                    meanPower(plotNum) = mean(mean(specPower(tStim,fBandRange),2));                                                    
+%                                                     % get time and frequency axes
+%                                                     tStim =  (tAxis>=STMin) & (tAxis<=STMax);
+% 
+%                                                     fRange =   (fAxis>=fMin) & (fAxis<=fMax);
+%                                                     fRangeVal = fAxis(fRange);                                                    
+% 
+%                                                     % get power values in LG and HG bands
+%                                                     dPower = specPower(tStim,fRange);
+%                                                     meanPeakFreqForCondition = findPeakBandWidth(dPower,fRangeVal);
+%                                                     fBandMin = meanPeakFreqForCondition - (desiredBandWidth/2-1);
+%                                                     fBandMax = meanPeakFreqForCondition + (desiredBandWidth/2);
+%                                                     fBandRange =   (fAxis>=fBandMin) & (fAxis<=fBandMax);
+%                                                     meanPower(plotNum) = mean(mean(specPower(tStim,fBandRange),2));                                                    
             
                                                     
                                                     figure(figG); subplot(xNum,yNum,plotNum); pcolor(tAxis,fAxis,specPower'); shading interp; ylim([0 100]); caxis([-3 3]);
                                                     title([num2str(plotNum) '; ' xTitle ': ' num2str(xAxis(iX)) '; ' yTitle ': ' num2str(yAxis(iY)) '; n=' num2str(totPos)]);
                                                     xlabel(['Elecs: ' num2str(EEGChannelsBip')]);
                                                     
-                                                    figure(figV); bar(meanPower);
-                                                    set(gca,'XTick',1:plotNum);
-%                                                     title([xTitle ': ' num2str(xAxis(iX)) '; ' yTitle ': ' num2str(yAxis(iY))]);
-%                                                     xlabel(['Elecs: ' num2str(EEGChannelsBip')]);
+%                                                     figure(figV); bar(meanPower);
+%                                                     set(gca,'XTick',1:plotNum);
+% %                                                     title([xTitle ': ' num2str(xAxis(iX)) '; ' yTitle ': ' num2str(yAxis(iY))]);
+% %                                                     xlabel(['Elecs: ' num2str(EEGChannelsBip')]);
                                                     
                                                     if a>1 || e>1 || s>4 || f>1 || o>1 || c>4 || t<7 || aa>1 || ae>1 || as>1 || ao>1 || av>1 || at>1 || plotNum == 1
                                                         BestEEGChans = union(BestEEGChans,EEGChannelsBip);

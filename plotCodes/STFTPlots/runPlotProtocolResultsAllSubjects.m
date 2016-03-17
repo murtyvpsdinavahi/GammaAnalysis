@@ -2,17 +2,11 @@
 clear all
 close all
 clc
-subjectName = 'VV';
-runPlotProtocolResults;
 
-clear all
-close all
-clc
-subjectName = 'GR';
-runPlotProtocolResults;
+[folderEEG,subjectNames,expDates,protocolNames,protocolTypes,gridType,folderSourceString,capMontage] = allDataLogsForAnalysisHumanEEG;
 
-clear all
-close all
-clc
-subjectName = 'RS';
-runPlotProtocolResults;
+subjectNames = unique(subjectNames);
+for subjectNum = 1:length(subjectNames)
+    subjectName = subjectNames{subjectNum};
+    runPlotProtocolResults(subjectName);
+end

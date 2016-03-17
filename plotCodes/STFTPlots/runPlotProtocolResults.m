@@ -1,8 +1,8 @@
-% runPlotProtocolResults
+function runPlotProtocolResults(subjectName)
 % Created by MD: 11/11/15
 
 % Variables
-subjectName = 'AD';
+% subjectName = 'AD';
 movingWin = [0.4 0.01];
 tapers = [2 3];
 BLPeriod = [-0.5 0];
@@ -135,3 +135,5 @@ plotProtocolResults(dataLogList,subjectIndices,protocolType,'none',plotHandles,r
 savefig(figG,fullfile(pwd,'Plots','VisualGammaProject','SubjectWise',subjectName,[subjectName '.fig']));
 close(figG);
 clear figG;
+
+end

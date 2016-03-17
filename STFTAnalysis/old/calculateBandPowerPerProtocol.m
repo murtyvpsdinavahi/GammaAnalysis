@@ -71,6 +71,8 @@ function [meanPowerAlphaAllElec,meanMinFreqForConditionAlpha,meanPowerLGAllElec,
 
             % TFA; calculate power at all freqs and time points
             [~,diffPower,tAxis,fAxis] = getSTFT(dataTF,movingWin,mtmParams,timeVals,BLMin,BLMax);
+            
+%             figure; pcolor(tAxis,fAxis,diffPower'); shading interp;
 
             % get time and frequency axes
             tStim =  (tAxis>=STMin) & (tAxis<=STMax);

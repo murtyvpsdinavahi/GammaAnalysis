@@ -257,6 +257,7 @@ ylabel(plotHandle,'10*(log10(dPower)');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if strcmpi(protocolType,'CON'); protocolType = 'Contrast'; end
 makeDirectory(fullfile(pwd,'Plots','VisualGammaProject','SubjectWise',subjectName));
-save(fullfile(pwd,'Plots','VisualGammaProject','SubjectWise',subjectName,[subjectName '.mat']));
+save(fullfile(pwd,'Plots','VisualGammaProject','SubjectWise',subjectName,[protocolType '.mat']));
 end
